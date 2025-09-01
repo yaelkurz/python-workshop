@@ -1,50 +1,42 @@
 import threading
 import time
-import math
-from functools import wraps
-import numpy as np
-
-def c_bound_task_numpy():
-    a = np.random.rand(1000, 1000)
-    b = np.random.rand(1000, 1000)
-    np.dot(a, b)
 
 
-def python_bound_task():
-    sum(x*x for x in range(10**6)) 
+def run_threads(num_tasks, num_threads, fn):
+    from queue import Queue
+
+    q = Queue()
+    for _ in range(num_tasks):
+        q.put(None)
+
+    def worker():
+        while not q.empty():
+            try:
+                q.get_nowait()
+            except:
+                return
+            fn()
+
+    threads = []
+    start = time.time()
+    for _ in range(num_threads):
+        t = threading.Thread(target=worker)
+        threads.append(t)
+        t.start()
+    for t in threads:
+        t.join()
+    print(
+        f"{fn.__name__}: {num_tasks} tasks on {num_threads} threads took {time.time() - start:.2f}s"
+    )
 
 
-# def timeit(fn):
-#     @wraps(fn)
-#     def wrapper(*args, **kwargs):
-#         start = time.time()
-#         result = fn(*args, **kwargs)
-#         print(f"{fn.__name__} took {time.time() - start:.2f}s")
-#         return result
-#     return wrapper
+def cpu_bound_task():
+    x = 0
+    for i in range(2**25):
+        x += i * i
 
 
-# def run_threads(count, fn, *args, **kwargs):
-#     threads = []
-#     for _ in range(count):
-#         t = threading.Thread(target=fn, args=args, kwargs=kwargs)
-#         threads.append(t)
-#         t.start()
-#     for t in threads:
-#         t.join()
-
-
-# @timeit
-# def demo_numpy_threads(count: int):
-#     run_threads(count, c_bound_task_numpy)
-
-# @timeit
-# def demo_python_threads(count: int):
-#     run_threads(count, python_bound_task)
-
-
-# if __name__ == "__main__":
-#     count = 100
-#     demo_numpy_threads(count)
-#     demo_python_threads(count)
-
+if __name__ == "__main__":
+    num_tasks = 5
+    num_threads = 5
+    run_threads(num_tasks, num_threads, cpu_bound_task)

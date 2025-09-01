@@ -13,7 +13,7 @@ async def run_benchmark(endpoint: str, num_requests: int):
 
         start = time()
         await asyncio.gather(*tasks)
-        duration = time() - start
+        duration = time() - start1
 
         print(f"{num_requests} requests to {endpoint} completed in {duration:.2f}s")
         print(f"-----------DONE------------")
@@ -29,3 +29,4 @@ if __name__ == "__main__":
     count = 1
 
     asyncio.run(run_benchmark(url, count))
+    
