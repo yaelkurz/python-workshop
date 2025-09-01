@@ -13,19 +13,19 @@ async def run_benchmark(endpoint: str, num_requests: int):
 
         start = time()
         await asyncio.gather(*tasks)
-        duration = time() - start1
+        duration = time() - start
 
         print(f"{num_requests} requests to {endpoint} completed in {duration:.2f}s")
         print(f"-----------DONE------------")
 
 if __name__ == "__main__":
-    # 🔧 Configure here
     endpoint_1 = "perfect-ping"
     endpoint_2 = "good-ping"
     endpoint_3 = "terrible-ping"
 
 
     url = f"http://localhost:8000/{endpoint_1}"
+    
     count = 1
 
     asyncio.run(run_benchmark(url, count))
